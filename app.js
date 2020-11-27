@@ -1,55 +1,69 @@
 const express = require("express");
 const mongoose = require("mongoose");
+var bodyParser = require("body-parser");
 require("dotenv").config();
 const cors = require("cors");
 
 const app = express();
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(
+  bodyParser.urlencoded({
+    // to support URL-encoded bodies
+    extended: true,
+  })
+);
 const URI = process.env.mongo_url;
 const connectDB = async () => {
   await mongoose.connect(
     URI,
     { useUnifiedTopology: true },
-    { useNewUrlParser: true }
+    { useNewUrlParser: true },
+    { useUnifiedTopology: true },
+    { useFindAndModify: false },
+    { useCreateIndex: true }
   );
   console.log("connected");
 };
 connectDB();
 app.use(cors());
-
-const airSchema = new mongoose.Schema(
+var sensorDataSchema = mongoose.Schema(
   {
-    date: { type: String },
-    time: { type: String },
-    CO: { type: String },
-    PT08: [
-      {
-        S1: { type: String },
-        S2: { type: String },
-        S3: { type: String },
-        S4: { type: String },
-        S5: { type: String },
-      },
-    ],
-    NHMC: { type: String },
-    C6H6: { type: String },
-    NOx: { type: String },
-    NO2: { type: String },
-    T: { type: String },
-    RH: { type: String },
-    AH: { type: String },
+    id: String,
+    nh3: String,
   },
-  { collection: "AirQuality" }
+  { collection: "test" }
 );
-const AirQuality = mongoose.model("AirQuality", airSchema);
+const sensor = mongoose.model("test", sensorDataSchema);
 
-app.get("/", function (req, res) {
-  var queryparam = req.query;
-  console.log(queryparam.limit);
-  AirQuality.find({}, function (err, airqual) {
+app.get("/all", function (req, res) {
+  console.log("sent");
+  sensor.find({}, function (err, sendata) {
     if (err) {
       console.log(err);
     } else {
-      res.json(airqual.splice(0, 2000));
+      res.json(sendata);
+    }
+  });
+});
+
+app.get("/id", function (req, res) {
+  sensor.distinct("mac", function (err, sendata) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(sendata);
+    }
+  });
+});
+
+app.post("/getone", function (req, res) {
+  const id = req.body.id;
+  console.log(id);
+  sensor.find({ mac: id }, function (err, sendata) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(sendata);
     }
   });
 });

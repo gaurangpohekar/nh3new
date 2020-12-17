@@ -81,8 +81,12 @@ app.post("/putdata", function (req, res) {
   const nh3_5 = req.body.nh3_5;
   const nh3_6 = req.body.nh3_6;
   const data = req.body;
-  sensor.create(data);
-  res.send("sent");
+ if(data.dateTime===""){
+    res.send("not sent")
+  }else{
+    sensor.create(data);
+    res.send("sent");
+  }
 });
 
 app.listen(process.env.PORT || 9000);

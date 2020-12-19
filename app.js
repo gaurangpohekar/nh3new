@@ -72,6 +72,16 @@ app.post("/getone", function (req, res) {
     }
   });
 });
+app.post("/daydata",async (req,res)=>{
+  const date=req.body.date
+  console.log(date);
+  const data = await sensor.find({
+    "dateTime": { $regex: `.*${date}.*` },})
+
+    console.log(data);
+    res.json(data)
+
+})
 
 app.post("/putdata", function (req, res) {
   const nh3_1 = req.body.nh3_1;

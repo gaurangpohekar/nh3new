@@ -34,6 +34,8 @@ var sensorDataSchema = mongoose.Schema(
     nh3_4: String,
     nh3_5: String,
     nh3_6: String,
+    temp: String,
+    hum: String,
     dateTime: String,
   },
   { collection: "test" }
@@ -90,6 +92,8 @@ app.post("/putdata", function (req, res) {
   const nh3_4 = req.body.nh3_4;
   const nh3_5 = req.body.nh3_5;
   const nh3_6 = req.body.nh3_6;
+  const temp  = req.body.temp;
+  const hum   = req.body.hum;
   const data = req.body;
  if(data.dateTime===""){
     res.send("not sent")
